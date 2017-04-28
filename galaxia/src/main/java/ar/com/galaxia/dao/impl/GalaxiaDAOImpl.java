@@ -36,7 +36,7 @@ public class GalaxiaDAOImpl implements GalaxiaDAO {
 	public void limpiarDatos() throws SQLException {
 		DBConect dbConect =  DBConect.getInstancia();
 		Connection con = dbConect.dameConexion();
-		String query = "DELETE FROM  DIA_CLIMA ";
+		String query = "TRUNCATE TABLE DIA_CLIMA ";		
 		PreparedStatement preparedStmt = null;
 		try {
 			preparedStmt = con.prepareStatement(query);
@@ -44,7 +44,10 @@ public class GalaxiaDAOImpl implements GalaxiaDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-//			preparedStmt.close();			
+			if(preparedStmt!=null){
+				preparedStmt.close();	
+			}
+						
 		}
 
 	}
@@ -55,13 +58,14 @@ public class GalaxiaDAOImpl implements GalaxiaDAO {
 		DBConect dbConect =  DBConect.getInstancia();
 		Connection con = dbConect.dameConexion();
 
-		Statement sentencias = null;
+		PreparedStatement sentencias = null;
 		ResultSet rs = null;
 
 		try {
-			sentencias = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			StringBuffer sql = new StringBuffer("SELECT * FROM DIA_CLIMA WHERE DIA=");
-			sql.append(dia);
+			
+			StringBuffer sql = new StringBuffer("SELECT * FROM DIA_CLIMA WHERE DIA=?");			
+			sentencias = con.prepareStatement(sql.toString());
+			sentencias.setInt(1, dia);
 			rs = sentencias.executeQuery(sql.toString());
 
 			while (rs.next()) {
@@ -77,8 +81,14 @@ public class GalaxiaDAOImpl implements GalaxiaDAO {
 			diaClima.setClima("No se pudo determinar");
 
 		} finally {
-			rs.close();
-			sentencias.close();
+			if(sentencias!=null){
+				sentencias.close();
+			}
+				
+			if(rs!=null){
+				rs.close();	
+			}			
+			
 		}
 		return diaClima;
 	}
@@ -107,36 +117,19 @@ public class GalaxiaDAOImpl implements GalaxiaDAO {
 			throw e;
 
 		} finally {
-			rs.close();
-			sentencias.close();
+			if(sentencias!=null){
+				sentencias.close();
+			}
+				
+			if(rs!=null){
+				rs.close();	
+			}		
 		}
 		return todosLosDias;
 
 	}
 
-	public void guardarDiaClima(List<DiaClima> diasClimas) throws SQLException {
-		DBConect dbConect =  DBConect.getInstancia();
-		Connection con = dbConect.dameConexion();
-		StringBuffer queryBfr= new StringBuffer();
-		for (DiaClima diaClima : diasClimas) {			
-			queryBfr.append( " insert into DIA_CLIMA VALUES values (");
-			queryBfr.append(diaClima.getDia());
-			queryBfr.append(",'");
-			queryBfr.append(diaClima.getClima());
-			queryBfr.append("');");
-		}
-		
-		PreparedStatement preparedStmt = null;
-		try {
-			preparedStmt = con.prepareStatement(queryBfr.toString());
-			preparedStmt.execute();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			preparedStmt.close();			
-		}
 
 
-	}
 
 }

@@ -15,6 +15,5 @@ public interface GalaxiaDAO {
 
 	List<DiaClima> obtenerClimaTodosLosDias() throws SQLException;
 
-	void guardarDiaClima(List<DiaClima> diasClimas) throws SQLException;
 
 }
