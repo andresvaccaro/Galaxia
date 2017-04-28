@@ -44,7 +44,7 @@ public class GalaxiaDAOImpl implements GalaxiaDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			preparedStmt.close();			
+//			preparedStmt.close();			
 		}
 
 	}
